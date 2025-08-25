@@ -17,8 +17,9 @@ def get_stock_prices(symbols):
             
             if data is not None and len(data) > 0:
                 price = data.iloc[-1]['close']
-                # Show full price precision
-                results.append(f"{symbol}: {price:,.2f} VND")
+                # Format VND price with k notation for all stock prices
+                price_formatted = f"{price:,.1f}k VND"
+                results.append(f"{symbol}: {price_formatted}")
             else:
                 results.append(f"{symbol}: N/A")
         except Exception as e:
@@ -57,8 +58,8 @@ def get_gold_prices():
             sell_price = sjc_row.get('sell_price', 'N/A')
             
             if buy_price != 'N/A' and sell_price != 'N/A':
-                buy_formatted = f"{buy_price/1000:,.0f}k"
-                sell_formatted = f"{sell_price/1000:,.0f}k"
+                buy_formatted = f"{buy_price/1000:,.0f}k VND"
+                sell_formatted = f"{sell_price/1000:,.0f}k VND"
                 return f"SJC Gold: Buy {buy_formatted} - Sell {sell_formatted}"
             else:
                 return f"SJC Gold: Buy {buy_price} - Sell {sell_price}"
@@ -84,7 +85,25 @@ def get_exchange_rates(currencies):
                     row = currency_row.iloc[0]
                     buy = row.get('buy _transfer', 'N/A') 
                     sell = row.get('sell', 'N/A')
-                    results.append(f"{currency}: Buy {buy} - Sell {sell}")
+                    
+                    # Format exchange rates with k notation
+                    try:
+                        # Clean string: remove commas used as thousand separators
+                        buy_clean = str(buy).replace(',', '') if buy != 'N/A' else '0'
+                        buy_num = float(buy_clean)
+                        buy_formatted = f"{buy_num/1000:,.1f}k VND" if buy_num > 0 else str(buy)
+                    except (ValueError, TypeError):
+                        buy_formatted = str(buy)
+                    
+                    try:
+                        # Clean string: remove commas used as thousand separators  
+                        sell_clean = str(sell).replace(',', '') if sell != 'N/A' else '0'
+                        sell_num = float(sell_clean)
+                        sell_formatted = f"{sell_num/1000:,.1f}k VND" if sell_num > 0 else str(sell)
+                    except (ValueError, TypeError):
+                        sell_formatted = str(sell)
+                    
+                    results.append(f"{currency}: Buy {buy_formatted} - Sell {sell_formatted}")
                 else:
                     results.append(f"{currency}: N/A")
         else:
@@ -95,31 +114,56 @@ def get_exchange_rates(currencies):
     return results
 
 def get_crypto_prices(symbols):
-    """Get cryptocurrency prices from CoinGecko"""
+    """Get cryptocurrency prices from CoinGecko with auto-detection"""
     results = []
     try:
-        # Map symbols to CoinGecko IDs
-        crypto_map = {'BTC': 'bitcoin', 'ETH': 'ethereum'}
-        ids = [crypto_map.get(s) for s in symbols if s in crypto_map]
-        
-        if not ids:
-            return ["Crypto: No valid symbols"]
-        
-        url = f"https://api.coingecko.com/api/v3/simple/price?ids={','.join(ids)}&vs_currencies=usd&include_24hr_change=true"
         headers = {'User-Agent': 'Mozilla/5.0'}
+        
+        # Auto-detect coin IDs by searching CoinGecko
+        coin_ids = []
+        for symbol in symbols:
+            search_url = f"https://api.coingecko.com/api/v3/search?query={symbol}"
+            search_response = requests.get(search_url, headers=headers, timeout=10)
+            
+            if search_response.status_code == 200:
+                search_data = search_response.json()
+                coins = search_data.get('coins', [])
+                
+                # Find exact symbol match
+                for coin in coins:
+                    if coin.get('symbol', '').upper() == symbol.upper():
+                        coin_ids.append(coin.get('id'))
+                        break
+        
+        if not coin_ids:
+            return ["Crypto: No coins found"]
+        
+        # Get prices for detected coins (both USD and VND)
+        url = f"https://api.coingecko.com/api/v3/simple/price?ids={','.join(coin_ids)}&vs_currencies=usd,vnd&include_24hr_change=true"
         response = requests.get(url, headers=headers, timeout=10)
         
         if response.status_code == 200:
             data = response.json()
             
-            for symbol in symbols:
-                crypto_id = crypto_map.get(symbol)
-                if crypto_id and crypto_id in data:
-                    price = data[crypto_id]['usd']
-                    change_24h = data[crypto_id].get('usd_24h_change', 0)
+            # Match results back to original symbols
+            for i, symbol in enumerate(symbols):
+                if i < len(coin_ids) and coin_ids[i] in data:
+                    coin_data = data[coin_ids[i]]
+                    usd_price = coin_data.get('usd', 0)
+                    vnd_price = coin_data.get('vnd', 0)
+                    change_24h = coin_data.get('usd_24h_change', 0)
                     
                     change_sign = "+" if change_24h >= 0 else ""
-                    results.append(f"{symbol}: ${price:,.2f} ({change_sign}{change_24h:.2f}%)")
+                    
+                    # Format VND price
+                    if vnd_price > 1000000:
+                        vnd_formatted = f"{vnd_price/1000000:,.1f}M VND"
+                    elif vnd_price > 1000:
+                        vnd_formatted = f"{vnd_price/1000:,.0f}k VND"
+                    else:
+                        vnd_formatted = f"{vnd_price:,.0f} VND"
+                    
+                    results.append(f"{symbol}: ${usd_price:,.2f} / {vnd_formatted} ({change_sign}{change_24h:.2f}%)")
                 else:
                     results.append(f"{symbol}: N/A")
         else:
