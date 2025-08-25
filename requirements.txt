@@ -1,3 +1,9 @@
-requests
-beautifulsoup4
-python-dotenv
+# Core dependencies
+requests>=2.32.0
+python-dotenv>=1.1.1
+
+# Market data library
+vnstock>=3.2.6
+
+# Data processing (included with vnstock but explicit for clarity)
+pandas>=2.0.0

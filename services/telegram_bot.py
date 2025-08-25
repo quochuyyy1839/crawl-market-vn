@@ -1,11 +1,14 @@
 import requests
-from config import TELEGRAM_URL, CHAT_ID, TIMEOUT
+from config import TELEGRAM_URL, CHAT_ID
 
-def send_to_telegram(message, parse_mode="MarkdownV2"):
+def send_to_telegram(message, parse_mode="Markdown"):
     """
-    Gửi tin nhắn đến Telegram bằng Bot.
+    Gửi tin nhắn đến Telegram với Markdown support
     """
-    print("Sending message to Telegram...")
+    if not message:
+        return
+        
+    print(f"Sending message to Telegram: {message[:50]}...")
     try:
         response = requests.post(
             TELEGRAM_URL,
@@ -14,7 +17,7 @@ def send_to_telegram(message, parse_mode="MarkdownV2"):
                 'text': message,
                 'parse_mode': parse_mode
             },
-            timeout=TIMEOUT
+            timeout=15
         )
         if response.status_code != 200:
             print(f"Error sending message: {response.status_code}, {response.text}")

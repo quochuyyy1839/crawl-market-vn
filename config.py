@@ -1,25 +1,34 @@
+"""
+Configuration loader from .env file
+"""
 import os
 from dotenv import load_dotenv
 
-# Load .env
-ENV_PATH = "/secrets/.env"
+# Load environment variables
+load_dotenv()
 
-# Kiểm tra nếu file tồn tại, thì load từ file đó, nếu không thì dùng load_dotenv() mặc định
-if os.path.exists(ENV_PATH):
-    load_dotenv(dotenv_path=ENV_PATH)
-else:
-    load_dotenv()
+# Telegram Config
+TOKEN = os.getenv('TOKEN', '')
+CHAT_ID = os.getenv('CHAT_ID', '')
 
-# Lấy các biến môi trường
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-CHAT_ID = os.getenv("CHAT_ID")
-USER_TAG = os.getenv("USER_TAG", "")
+# Feature Toggles
+STOCK_PRICE_ENABLED = os.getenv('STOCK_PRICE', 'false').lower() == 'true'
+VNINDEX_ENABLED = os.getenv('VNINDEX', 'false').lower() == 'true'
+GOLD_PRICE_ENABLED = os.getenv('GOLD_PRICE', 'false').lower() == 'true'
+EXCHANGE_RATE_ENABLED = os.getenv('EXCHANGE_RATE', 'false').lower() == 'true'
+CRYPTO_PRICE_ENABLED = os.getenv('CRYPTO_PRICE', 'false').lower() == 'true'
 
-# Các hằng số / đường dẫn cố định
-TELEGRAM_URL = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-URL = "https://www.24h.com.vn/gia-vang-hom-nay-c425.html"
-TIMEOUT = 15
+# Symbols
+STOCK_SYMBOLS = os.getenv('STOCK', 'VCB,VIC,HPG').split(',')
+GOLD_SYMBOLS = os.getenv('GOLD', 'SJC').split(',')
+CRYPTO_SYMBOLS = os.getenv('CRYPTO', 'BTC,ETH').split(',')
+EXCHANGE_SYMBOLS = os.getenv('EXCHANGE', 'USD,EUR,JPY').split(',')
 
-print("Loaded environment variables:")
-for key, value in os.environ.items():
-    print(f"{key}: {value}")
+# Clean up symbols (remove whitespace)
+STOCK_SYMBOLS = [s.strip() for s in STOCK_SYMBOLS]
+GOLD_SYMBOLS = [s.strip() for s in GOLD_SYMBOLS]
+CRYPTO_SYMBOLS = [s.strip() for s in CRYPTO_SYMBOLS]
+EXCHANGE_SYMBOLS = [s.strip() for s in EXCHANGE_SYMBOLS]
+
+# Telegram URL
+TELEGRAM_URL = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
