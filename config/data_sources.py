@@ -1,15 +1,11 @@
 """
-Configuration loader from .env file
+Data source specific configurations
 """
 import os
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
-
-# Telegram Config
-TOKEN = os.getenv('TOKEN', '')
-CHAT_ID = os.getenv('CHAT_ID', '')
 
 # Feature Toggles
 STOCK_PRICE_ENABLED = os.getenv('STOCK_PRICE', 'false').lower() == 'true'
@@ -29,6 +25,3 @@ STOCK_SYMBOLS = [s.strip() for s in STOCK_SYMBOLS]
 GOLD_SYMBOLS = [s.strip() for s in GOLD_SYMBOLS]
 CRYPTO_SYMBOLS = [s.strip() for s in CRYPTO_SYMBOLS]
 EXCHANGE_SYMBOLS = [s.strip() for s in EXCHANGE_SYMBOLS]
-
-# Telegram URL
-TELEGRAM_URL = f"https://api.telegram.org/bot{TOKEN}/sendMessage"

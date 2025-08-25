@@ -1,5 +1,5 @@
 import requests
-from config import TELEGRAM_URL, CHAT_ID
+from config.telegram import TELEGRAM_URL, CHAT_ID
 
 def send_to_telegram(message, parse_mode="Markdown"):
     """
