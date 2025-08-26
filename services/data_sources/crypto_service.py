@@ -35,8 +35,8 @@ class CryptoService(BaseMarketDataService):
                 if symbol.endswith('USDT'):
                     base_symbol = symbol.replace('USDT', '')
                     ticker_map[base_symbol] = ticker
-                # Get real-time USD/VND rate
-                elif symbol == 'USDTVND' or symbol == 'USDCVND':
+                # Get real-time USD/VND rate from available pairs
+                elif symbol == 'USDTBVND' or symbol == 'BUSDBVND':
                     usd_to_vnd = float(ticker['lastPrice'])
             
             if usd_to_vnd is None:
