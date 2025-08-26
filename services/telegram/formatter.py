@@ -40,9 +40,12 @@ def format_combined_message(gold_data, stock_data, vnindex_data, exchange_data, 
             message += f"{crypto_info}\n"
         message += "```\n\n"
     
-    # Add timestamp
-    now = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
-    message += f"_Updated: {now}_"
+    # Add timestamp in UTC+7
+    from datetime import timedelta
+    utc_now = datetime.utcnow()
+    vietnam_time = utc_now + timedelta(hours=7)
+    now = vietnam_time.strftime('%d/%m/%Y %H:%M:%S')
+    message += f"_Updated: {now} (UTC+7)_"
     
     return message
 
