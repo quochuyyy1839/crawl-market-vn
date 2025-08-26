@@ -13,8 +13,14 @@ class IndexService(BaseMarketDataService):
     def fetch_data(self) -> str:
         """Get VN-Index with daily changes"""
         try:
+            from datetime import datetime, timedelta
+            
+            # Dynamic date range - last 30 days to today
+            end_date = datetime.now().strftime('%Y-%m-%d')
+            start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+            
             index_obj = Vnstock().world_index(symbol='VNI', source='MSN')
-            data = index_obj.quote.history(start='2024-01-01', end='2024-12-31', interval='1D')
+            data = index_obj.quote.history(start=start_date, end=end_date, interval='1D')
             
             if data is not None and len(data) > 0:
                 latest = data.iloc[-1]

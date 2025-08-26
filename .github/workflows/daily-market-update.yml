@@ -1,6 +1,9 @@
 name: Daily Market Update
 
 on:
+  push:
+    branches:
+      - main
   schedule:
     # Run at 15:30 UTC+7 = 08:30 UTC daily
     - cron: '30 8 * * *'

@@ -2,6 +2,9 @@
 requests>=2.32.0
 python-dotenv>=1.1.1
 
+# Telegram bot
+python-telegram-bot>=20.0
+
 # Market data library
 vnstock>=3.2.6
 

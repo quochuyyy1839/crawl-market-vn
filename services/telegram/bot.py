@@ -1,27 +1,44 @@
-import requests
-from config.telegram import TELEGRAM_URL, CHAT_ID
+import asyncio
+from telegram import Bot
+from telegram.constants import ParseMode
+from config.settings import TOKEN, CHAT_ID
 
 def send_to_telegram(message, parse_mode="Markdown"):
     """
-    Gửi tin nhắn đến Telegram với Markdown support
+    Gửi tin nhắn đến Telegram sử dụng python-telegram-bot library
     """
-    if not message:
+    if not message or not TOKEN or not CHAT_ID:
+        print("Missing message, token, or chat_id")
         return
         
     print(f"Sending message to Telegram: {message[:50]}...")
+    
+    # Run async function in sync context
+    asyncio.run(_send_message_async(message, parse_mode))
+
+async def _send_message_async(message, parse_mode):
+    """
+    Async function to send message using telegram bot
+    """
     try:
-        response = requests.post(
-            TELEGRAM_URL,
-            data={
-                'chat_id': CHAT_ID,
-                'text': message,
-                'parse_mode': parse_mode
-            },
-            timeout=15
+        bot = Bot(token=TOKEN)
+        
+        # Convert parse_mode string to ParseMode enum
+        telegram_parse_mode = ParseMode.MARKDOWN if parse_mode == "Markdown" else None
+        
+        await bot.send_message(
+            chat_id=CHAT_ID,
+            text=message,
+            parse_mode=telegram_parse_mode
         )
-        if response.status_code != 200:
-            print(f"Error sending message: {response.status_code}, {response.text}")
-        else:
-            print("Message sent successfully.")
-    except requests.RequestException as e:
+        
+        print("Message sent successfully.")
+        
+    except Exception as e:
         print(f"Error sending message to Telegram: {e}")
+    finally:
+        # Clean up bot session
+        try:
+            await bot.close()
+        except:
+            pass
