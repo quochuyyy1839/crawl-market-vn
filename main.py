@@ -11,6 +11,7 @@ from services.data_sources.exchange_service import ExchangeService
 from services.data_sources.crypto_service import CryptoService
 from services.telegram.formatter import format_combined_message
 from services.telegram.bot import send_to_telegram
+from config.settings import TELEGRAM_ENABLED
 from config.data_sources import (
     STOCK_PRICE_ENABLED, VNINDEX_ENABLED, GOLD_PRICE_ENABLED,
     EXCHANGE_RATE_ENABLED, CRYPTO_PRICE_ENABLED,
@@ -42,7 +43,35 @@ def main():
     # Collect all data
     results = collector.collect_all(service_configs)
     
-    # Format and send single combined message
+    # Print collected data to console
+    print("\n" + "="*60)
+    print("COLLECTED MARKET DATA:")
+    print("="*60)
+    
+    if results.get('gold'):
+        print(f"🥇 GOLD: {results['gold']}")
+    
+    if results.get('stock'):
+        print("📈 STOCKS:")
+        for stock in results['stock']:
+            print(f"   {stock}")
+    
+    if results.get('vnindex'):
+        print(f"📊 VN-INDEX: {results['vnindex']}")
+    
+    if results.get('exchange'):
+        print("💱 EXCHANGE:")
+        for rate in results['exchange']:
+            print(f"   {rate}")
+    
+    if results.get('crypto'):
+        print("₿ CRYPTO:")
+        for crypto in results['crypto']:
+            print(f"   {crypto}")
+    
+    print("="*60)
+    
+    # Format and send message to Telegram if enabled
     message = format_combined_message(
         results.get('gold'), 
         results.get('stock'), 
@@ -52,8 +81,9 @@ def main():
     )
     
     if message:
-        print("Sending combined market update to Telegram...")
-        send_to_telegram(message)
+        if TELEGRAM_ENABLED:
+            print("\nSending combined market update to Telegram...")
+            send_to_telegram(message)
     else:
         print("No data to send")
     

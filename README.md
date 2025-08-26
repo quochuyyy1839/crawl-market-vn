@@ -1,14 +1,17 @@
-# Market Data Notification Bot 📊
+# Vietnam Market Data Bot 📊
 
-A comprehensive bot that fetches Vietnamese market data and sends separate notifications to Telegram for each data type. Built with vnstock library for accurate and real-time data.
+A comprehensive bot that fetches Vietnamese market data and can send notifications to Telegram. Built with vnstock library for accurate and real-time data. Perfect for local development and automated deployment.
 
 ## Features 🚀
 
 - **📈 Vietnamese Stock Prices**: Real-time prices from VCI source
 - **📊 VN-Index**: Market index with daily changes  
 - **🥇 Gold Prices**: SJC gold buy/sell rates
-- **💱 Exchange Rates**: VCB foreign exchange rates
-- **₿ Cryptocurrency**: Bitcoin and Ethereum prices
+- **💱 Exchange Rates**: VCB foreign exchange rates with VND conversion
+- **₿ Cryptocurrency**: Multiple crypto prices from CryptoCompare API
+- **🔔 Optional Telegram Notifications**: Enable/disable as needed
+- **🖥️ Console Output**: Always prints data for monitoring
+- **⚙️ Configurable**: Toggle data sources via environment variables
 
 ## Installation 🛠️
 
@@ -34,9 +37,12 @@ A comprehensive bot that fetches Vietnamese market data and sends separate notif
 Create a `.env` file with the following variables:
 
 ```env
-# Telegram Bot Config
+# Telegram Bot Config (required only if TELEGRAM_ENABLED=true)
 TOKEN=your_bot_token_here
 CHAT_ID=your_chat_id_here
+
+# Notification Settings
+TELEGRAM_ENABLED=false  # Set to true to enable Telegram notifications
 
 # Feature Toggles (true/false)
 STOCK_PRICE=true
@@ -45,16 +51,17 @@ GOLD_PRICE=true
 EXCHANGE_RATE=true
 CRYPTO_PRICE=true
 
-# Symbols to track
-STOCK=VCB,VIC,HPG,VHM,MSN,TCB
+# Symbols to track (comma-separated, no spaces)
+STOCK=VCB,TCB,VPB,MBB,VIC,HPG
 GOLD=SJC
-CRYPTO=BTC,ETH
-EXCHANGE=USD,EUR,JPY
+CRYPTO=BTC,ETH,BNB,USDT,DOGE,SOL
+EXCHANGE=USD
 ```
 
-### Feature Toggles
-- Set any feature to `false` to disable that notification
-- Customize symbols by modifying the comma-separated lists
+### Configuration Options
+- **TELEGRAM_ENABLED**: Set to `true` to send notifications to Telegram, `false` for console-only output
+- **Feature Toggles**: Set any feature to `false` to disable that data source
+- **Symbols**: Customize by modifying the comma-separated lists (no spaces)
 
 ## Usage 🎯
 
@@ -63,17 +70,17 @@ EXCHANGE=USD,EUR,JPY
 python3 main.py
 ```
 
-**Test individual features:**
-```bash
-python3 stock_price.py  # Console output for testing
-```
+The bot will:
+1. **Always print data to console** for monitoring
+2. **Optionally send to Telegram** if `TELEGRAM_ENABLED=true`
 
-The bot will send **5 separate messages** to your Telegram chat:
-1. Stock prices with current VND rates
-2. VN-Index with daily change percentage  
-3. SJC gold buy/sell prices
-4. VCB exchange rates for major currencies
-5. Crypto prices with 24h change
+### Local Development
+- Set `TELEGRAM_ENABLED=false` to avoid spamming Telegram during development
+- All market data will be printed to console for verification
+
+### Production Deployment  
+- Set `TELEGRAM_ENABLED=true` to enable notifications
+- Sends a **single combined message** with all market data
 
 ## Message Format 📱
 
@@ -99,7 +106,7 @@ _Cập nhật: 26/08/2025 00:30:15_
 - **Stocks & Index**: vnstock library (VCI/MSN sources)
 - **Gold**: vnstock SJC official rates
 - **Exchange**: vnstock VCB official rates  
-- **Crypto**: CoinGecko API for accurate pricing
+- **Crypto**: CryptoCompare API with VCB USD/VND conversion
 
 ## Docker Support 🐳
 
