@@ -1,0 +1,40 @@
+name: Daily Market Update
+
+on:
+  schedule:
+    # Run at 15:30 UTC+7 = 08:30 UTC daily
+    - cron: '30 8 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  market-update:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Run market data bot
+      env:
+        TOKEN: ${{ secrets.TOKEN }}
+        CHAT_ID: ${{ secrets.CHAT_ID }}
+        STOCK_PRICE: true
+        VNINDEX: true
+        GOLD_PRICE: true
+        EXCHANGE_RATE: true
+        CRYPTO_PRICE: true
+        STOCK: VCB,TCB,VPB,MBB,VIC,HPG
+        GOLD: SJC
+        CRYPTO: BTC,ETH,BNB,USDT,DOGE,SOL
+        EXCHANGE: USD
+      run: python main.py
