@@ -37,7 +37,7 @@ jobs:
         GOLD_PRICE: true
         EXCHANGE_RATE: true
         CRYPTO_PRICE: true
-        STOCK: VCB,TCB,VPB,MBB,VIC,HPG
+        STOCK: FPT,HPG,VPB,TCB,MBB
         GOLD: SJC
         CRYPTO: BTC,ETH,BNB,USDT,DOGE,SOL
         EXCHANGE: USD
