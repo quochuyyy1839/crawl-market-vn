@@ -17,8 +17,14 @@ class StockService(BaseMarketDataService):
         
         for symbol in symbols:
             try:
+                from datetime import datetime, timedelta
+                
+                # Dynamic date range - last 30 days to today
+                end_date = datetime.now().strftime('%Y-%m-%d')
+                start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+                
                 stock = Vnstock().stock(symbol=symbol, source='VCI')
-                data = stock.quote.history(start='2024-01-01', end='2024-12-31', interval='1D')
+                data = stock.quote.history(start=start_date, end=end_date, interval='1D')
                 
                 if data is not None and len(data) > 0:
                     price = data.iloc[-1]['close']
