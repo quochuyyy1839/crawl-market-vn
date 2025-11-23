@@ -37,8 +37,8 @@ jobs:
         GOLD_PRICE: true
         EXCHANGE_RATE: true
         CRYPTO_PRICE: true
-        STOCK: FPT,HPG,VPB,TCB,MBB
+        STOCK: FPT,HPG,VPB,TCB,VPX
         GOLD: SJC
-        CRYPTO: BTC,ETH,BNB,USDT,DOGE,SOL
+        CRYPTO: BTC,ETH,BNB,USDT
         EXCHANGE: USD
       run: python main.py
